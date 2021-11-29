@@ -79,7 +79,12 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
+handles.data2 = rgb2gray(imread(fullfile(name_path1,name_file1)));
+guidata(hObject,handles);
+axes(handles.axes2);
+imshow(handles.data2);
+title('Citra Asli');
+    
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
@@ -107,6 +112,25 @@ function pushbutton5_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+[name_file1,name_path1] = uigetfile( ...
+    {'*.bmp;*.jpg;*.tif','Files of type (*.bmp,*.jpg,*.tif)';
+    '*.bmp','File Bitmap (*.bmp)';...
+    '*.jpg','File jpeg (*.jpg)';
+    '*.tif','File Tif (*.tif)';
+    '*.*','All Files (*.*)'},...
+    'Open Image');
+if ~isequal(name_file1,0)
+    handles.data1 = imread(fullfile(name_path1,name_file1));
+    guidata(hObject,handles);
+    axes(handles.axes1);
+    imshow(handles.data1);
+    title('Citra Asli');
+
+    
+    
+else
+    return;
+end
 
 
 function edit1_Callback(hObject, eventdata, handles)
