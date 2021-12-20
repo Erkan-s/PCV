@@ -85,8 +85,8 @@ function pushbutton1_Callback(hObject, eventdata, handles)
     '*.*', 'Semua File (*.*)'},...
     'Buka Citra asli');
     
-if ~isequal (nama_file1, 0)
-    handles.data1 = imread(fullfile(nama_path1, nama_file1));
+if ~isequal (name_file1, 0)
+    handles.data1 = imread(fullfile(name_path1, name_file1));
     guidata(hObject, handles);
     handles.current_data1 = handles.data1;
     axes(handles.axes1);
