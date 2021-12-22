@@ -22,7 +22,7 @@ function varargout = RGB(varargin)
 
 % Edit the above text to modify the response to help RGB
 
-% Last Modified by GUIDE v2.5 10-Dec-2021 00:48:20
+% Last Modified by GUIDE v2.5 22-Dec-2021 23:23:16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -78,30 +78,101 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[name_file1,name_path1] = uigetfile(...
-    {'*.bmp; *.jpg', 'File Citra (*.bmp, *.jpg)';
-    '*.bmp', 'File Bitmap(*.bmp)';...
-    '*.jpg', 'File Jpeg (*.jpg)';
-    '*.*', 'Semua File (*.*)'},...
-    'Buka Citra asli');
+
+% memanggil menu "browse file"
+[nama_file, nama_folder] = uigetfile('*.jpg');
+
+%jika ada nama file yang dipilih maka akan mengeksekusi 
+%perintah dibawah ini
+if ~isequal(nama_file,0)
+    % membaca file citra asli
+    img = imread(fullfile(nama_folder,nama_file));
     
-if ~isequal (name_file1, 0)
-    handles.data1 = imread(fullfile(name_path1, name_file1));
-    guidata(hObject, handles);
-    handles.current_data1 = handles.data1;
-    axes(handles.axes1);
-    imshow(handles.current_data1);
+    % menghitung rata-rata nilai citra asli ke nilai rgb
+    a = imread(fullfile(nama_folder,nama_file));
+%     red = mean(mean(a(:,:,1)));
+%     green = mean(mean(a(:,:,2)));
+%     blue = mean(mean(a(:,:,3)));
+%     fitur = [red green blue]; % mematrikkan fitur
+%     %xlswrite('fiturwarna.xls',fitur); % menyimpan fitur ke file excel
+%     %figure, imshow(a)
+    
+    % mengkonversi citra asli menjadi citra hsv
+    hsv = rgb2hsv(a);
+    h = hsv(:,:,1);
+    s = hsv(:,:,2);
+    v = hsv(:,:,3);
+    
+    % menampilkan citra asli pada axes
+    axes(handles.axes1)
+    imshow(img)
+    title('Citra Asli')
+    
+    % menampilkan citra hsv
+    axes(handles.axes2)
+    imshow(hsv)
+    title('Citra HSV')
+    
+    % menghitung nilai citra asli ke nilai rgb
+    red = mean(mean(a(:,:,1)));
+    green = mean(mean(a(:,:,2)));
+    blue = mean(mean(a(:,:,3)));
+    fitur = [red green blue]; % mematrikkan fitur
+    
+    % menampilkan nilai RGB
+    set(handles.edit1,'string',red);
+    set(handles.edit2,'string',green);
+    set(handles.edit3,'string',blue);
+    
+    % mencari nilai hsv
+    hue = hsv(:,:,1);
+    saturation = hsv(:,:,2);
+    value = hsv(:,:,3);
+    
+    
+    meanhue = mean2(hue);
+    meansaturation = mean2(saturation);
+    meanvalue = mean2(value);
+    display(meanhue);
+    
+    % menampilkan nilai HSV
+    set(handles.edit4,'string',meanhue);
+    set(handles.edit5,'string',meansaturation);
+    set(handles.edit6,'string',meanvalue);
+    
+    % mengubah nilai piksel background menjadi nol
+    %hue(~fitur) = 0;
+    %saturation(~fitur) = 0;
+    %value(~fitur) = 0;
+ 
+    % menghitung rata-rata nilai hue, saturation, dan value
+    %data_uji(1,1) = sum(sum(hue))/sum(sum(fitur));
+    %data_uji(1,2) = sum(sum(saturation))/sum(sum(fitur));
+    %data_uji(1,3) = sum(sum(value))/sum(sum(fitur));
+
+    % menyimpan variabel img pada lokasi handles agar dapat dipanggil
+    % pushbutton lain
+    %handles.img = img;
+    %handles.hsv = hsv;
+    %handles.hue = hue;
+    %handles.saturation = saturation;
+    %handles.v = value;
+    %guidata(hObject, handles)
+    
+    % memanggil model hasil pelatihan
+    %load Mdl
+
+    % membaca kelas keluaran hasil pengujian
+    %kelas_keluaran = predict(Mdl,data_uji);
+
+    % menampilkan kelas keluaran hasil pengujian pada edit text
+    %set(handles.edit7,'String',kelas_keluaran{1})
+    
+    
 else
+    %jika ada nama file yang dipilih maka akan kembali
     return
 end
-
-red = mean(mean(handles.current_data1(:,:,1)));
-green = mean(mean(handles.current_data1(:,:,2)));
-blue = mean(mean(handles.current_data1(:,:,3)));
-
-set(handles.edit1, 'string', red);
-set(handles.edit2, 'string', green);
-set(handles.edit3, 'string', blue);
 
 
 % --- Executes on button press in pushbutton2.
@@ -110,6 +181,23 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% mereset tampilan gui
+set(handles.edit1,'String',[])
+set(handles.edit2,'String',[])
+set(handles.edit3,'String',[])
+set(handles.edit4,'String',[])
+set(handles.edit5,'String',[])
+set(handles.edit6,'String',[])
+
+axes(handles.axes1)
+cla reset
+set(gca,'XTick',[])
+set(gca,'YTick',[])
+
+axes(handles.axes2)
+cla reset
+set(gca,'XTick',[])
+set(gca,'YTick',[])
 
 
 function edit1_Callback(hObject, eventdata, handles)
@@ -170,6 +258,75 @@ function edit3_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function edit3_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit4_Callback(hObject, eventdata, handles)
+% hObject    handle to edit4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit4 as text
+%        str2double(get(hObject,'String')) returns contents of edit4 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit4_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit5_Callback(hObject, eventdata, handles)
+% hObject    handle to edit5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit5 as text
+%        str2double(get(hObject,'String')) returns contents of edit5 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit5_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit6_Callback(hObject, eventdata, handles)
+% hObject    handle to edit6 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit6 as text
+%        str2double(get(hObject,'String')) returns contents of edit6 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit6_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
